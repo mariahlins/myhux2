@@ -1,0 +1,111 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+
+typedef struct node{
+    int item;
+    struct node* next; 
+}node;
+
+void freeList(node *head){
+    while(head!=NULL){
+        node *temp=head;
+        head=head->next;
+        free(temp);
+    }
+}
+
+node* createNode(int item){
+    struct node* newnode=(node*) malloc(sizeof(struct node)); 
+    newnode->item=item;
+    newnode->next=NULL;
+    return newnode;
+}
+
+node* addNode(node* head, int item){
+    node *new_node=(node*) malloc(sizeof(struct node));
+    new_node->item=item;
+    new_node->next=head;
+    return new_node;
+
+}
+
+node* addInOrder(node* head,int item){
+
+    struct node *current=head;
+    while(current!=NULL){
+        if(item==current->item) return head;
+        else current=current->next;
+    }
+
+    node *new_node=createNode(item);
+
+    if(head==NULL || (head->item)>item){
+        new_node->next= head;
+        head=new_node;
+        return new_node;
+    }
+
+    current= head;
+
+    while(current->next!=NULL && item > current->next->item){
+        current=current->next;
+    }
+
+    new_node->next=current->next;
+    current->next=new_node;
+    return head;
+}
+
+int main(){
+    int item;
+    struct node *lista1=NULL;
+    struct node *lista2=NULL;
+    struct node *listaf=NULL;
+
+    for(int i=0;i<20;i++){
+        scanf("%d",&item);
+        if(i==0) lista1=createNode(item);
+        else lista1=addNode(lista1,item);
+    }
+
+    for(int i=0;i<20;i++){
+        scanf("%d",&item);
+        if(i==0) lista2=createNode(item);
+        else lista2=addNode(lista2,item);
+    }
+
+    struct node* current1=lista1;
+
+    while(current1!=NULL){
+        struct node* current2=lista2;
+        while(current2!=NULL){
+            if(current1->item == current2->item) {
+                listaf=addInOrder(listaf, current1->item);
+                break;
+            }
+            current2=current2->next;
+        }
+        current1=current1->next;
+    }
+
+    listaf=addInOrder(listaf,-1);
+    listaf=listaf->next;
+    struct node *current=listaf;
+
+    if(current==NULL){
+        printf("VAZIO\n");
+    }else{
+        while(current!=NULL) {
+            printf("%d\n",current->item);
+            current=current->next;
+        }
+    }
+
+    freeList(lista1);
+    freeList(lista2);
+    freeList(listaf);
+
+    return 0;
+}
