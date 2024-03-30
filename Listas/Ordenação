@@ -1,0 +1,61 @@
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include <stdlib.h>
+
+typedef struct node{
+    int item;
+    struct node *next;
+}node;
+
+node* ordernarLista(node *head){
+    node *current=head;
+    while(current!=NULL){
+      node *current2=current->next;
+      while(current2!=NULL){
+        if(current->item > current2->item){
+          int temp=current->item;
+          current->item=current2->item;
+          current2->item=temp;
+        }
+        current2=current2->next;
+      }
+      current=current->next;
+    }
+    return head;
+}
+
+node* add(node *head, int item){
+    node *new_node=(node*) malloc(sizeof(struct node));
+    new_node->item=item;
+    new_node->next=NULL;
+
+    if(head==NULL) return new_node;
+
+    struct node *current=head;
+
+    while(current->next!=NULL){
+        current=current->next;    
+    }
+
+    current->next=new_node;
+
+    return head;
+}
+
+int main(){
+    struct node *lista=NULL;
+    int item;
+    while(scanf("%d",&item)==1){
+        lista=add(lista,item);
+    }
+
+    node *current=ordernarLista(lista);
+
+    while(current!=NULL){
+      printf("%d ",current->item);
+      current=current->next;
+    }
+
+  return 0;
+}
