@@ -1,0 +1,104 @@
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include <stdlib.h>
+
+typedef struct stack{
+    struct node *top;
+}stack;
+
+typedef struct node{
+    char item;
+    struct node *next;
+}node;
+
+stack *create_stack(){
+    stack * new_stack=(stack*)malloc(sizeof(stack));
+    new_stack->top =NULL;
+    return new_stack;
+}
+
+int desempilhar(    stack *stack){
+    if(stack->top==NULL){
+        return 0;
+    }
+        node *temp=stack->top;
+    int item=temp->item;
+    stack->top=temp->next;
+    free(temp);
+    return 1;
+}
+
+void liberarPilha(  stack *stack){
+    node *current=stack->top;
+  while(current!=NULL){
+        node *aux=current;
+    current=current->next;
+    free(aux);
+  }
+}
+
+void empilhar(stack *stack, char item){
+    node *new_top = (node*)malloc(sizeof(node));
+    new_top->item=item;
+    new_top->next=stack->top;
+    stack->top=new_top;
+}
+
+int balanceamento(stack *stackP, stack *stackC,char str[]){
+    int i=0;
+    while(str[i]!= '\0'){
+      if(str[i]=='('){
+        empilhar(stackP,str[i]);
+      }else if(str[i]==')'){
+        if(!desempilhar(stackP)){
+          return 0; 
+        }
+      }else if(str[i]=='['){
+        empilhar(stackC,str[i]);
+      }else if(str[i]==']'){
+        if(!desempilhar(stackC)){
+          return 0;
+        }
+      }
+        i++;
+    }
+    if(stackC->top==NULL && stackP->top==NULL) return 1;
+    else return 0;
+}
+
+int triagem(char str[]){
+  int cont=0;
+  for(int i=0;i<strlen(str);i++){
+    if(str[i]!=' ') cont+=1;
+  }
+  if((cont)%2==0) return 1;
+  else return 0;
+}
+
+int main(){
+    int vezes;
+    char str[100];
+    scanf("%d",&vezes);
+    getchar();
+
+    for(int i=0;i<vezes;i++){
+        stack* stackP=create_stack();
+        stack* stackC=create_stack();
+      fgets(str,sizeof(str),stdin);
+
+      if(str[strlen(str)-1]=='\n') str[strlen(str)-1]='\0';
+
+    if(!triagem(str)) printf("No\n");
+      else{  
+        if(str[0]=='\n'){
+            printf("Yes\n");
+        }else{
+            printf(balanceamento(stackP,stackC,str) ? "Yes\n" : "No\n");
+        }
+        if(stackC->top!=NULL) liberarPilha(stackC);
+        if(stackP->top!=NULL) liberarPilha(stackP);
+      }
+    }
+    return 0;
+}
