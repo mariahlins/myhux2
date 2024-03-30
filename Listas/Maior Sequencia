@@ -1,0 +1,34 @@
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include <stdlib.h>
+
+void procuraMaior(char sequencia[],int size){
+    int head=0,start=0,end=0,cont=0,contaux=0;
+    for(int i=0;i<size;i++){
+        if(sequencia[i]=='0'){
+            cont++;
+            if(cont==1) head=i;
+        }else if(sequencia[i]=='1'){
+            if(cont>contaux){
+                start=head;
+                end=i;
+                contaux=cont;
+                cont=0;
+            }else{
+                cont=0;
+            }
+        }
+    }
+    if(start==0 && end==0) return;
+    printf("%d %d\n",start,end-1);
+}
+
+int main(){
+    char sequencia[100];
+    while (fgets(sequencia,sizeof(sequencia),stdin)!=NULL && strcmp(sequencia,"0\n")!=0) {
+        int size=strlen(sequencia);
+        procuraMaior(sequencia,size);
+    }
+  return 0;
+}
