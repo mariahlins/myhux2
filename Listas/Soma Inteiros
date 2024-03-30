@@ -1,0 +1,113 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+typedef struct node{
+    int item;
+    struct node *next;
+}node;
+
+void freeList(node *head){
+    while(head!=NULL){
+        node *temp=head;
+        head=head->next;
+        free(temp);
+    }
+}
+
+node* add(node *head, int item){
+    node *new_node = (node*) malloc(sizeof(struct node));
+    new_node->item = item;
+    new_node->next = head;
+    return new_node;
+}
+
+node* createNode(int item){
+    node *new_node = (node*) malloc(sizeof(struct node));
+    new_node->item = item;
+    new_node->next = NULL;
+    return new_node;
+}
+
+node* sum(node *head,node *head2,node *headR){
+    int itemm=(head->item)+(head2->item);
+    add(headR,itemm);
+}
+
+int main(){
+    struct node *head=NULL;
+    struct node *head2=NULL;
+    char digito;
+    int cont1=0,cont2=0;
+
+    while (scanf(" %c", &digito)==1 && digito!='+') {
+        if(digito>='0' && digito<='9'){
+            int digitoItem=digito-'0';
+            if(cont1>0){
+                head=add(head,digitoItem);
+            }else{
+                if(digitoItem!=0){
+                    head=createNode(digitoItem);
+                    cont1++;
+                }
+            }
+        }
+    }
+
+    while (scanf(" %c", &digito)==1 && digito!='=') {
+        if(digito>='0' && digito<='9'){
+            int digitoItem=digito-'0';
+            if(cont2>0){
+                head2=add(head2,digitoItem);
+            }else{
+                if(digitoItem!=0){
+                    head2=createNode(digitoItem);
+                    cont2++;
+                }
+            }
+        }
+    }
+
+    if(head==NULL && head2==NULL){
+        printf("Lista vazia!");
+        return 0;
+    }
+
+    struct node *headR=NULL;
+    int vaiAum=0;
+
+    while(head!=NULL || head2!=NULL){
+        int soma=vaiAum;
+        if(head!=NULL){
+            soma+=head->item;
+            head=head->next;
+        }
+
+        if(head2!=NULL){
+            soma+=head2->item;
+            head2=head2->next;
+        }
+
+        vaiAum=soma/10;
+        soma%=10;
+        if(headR==NULL){
+            headR=createNode(soma);
+        }else{
+            headR=add(headR,soma);
+        }
+    }
+
+    if(vaiAum>0){
+        headR=add(headR,vaiAum);
+    }
+
+    struct node *current=headR;
+
+    while(current!=NULL){
+        if(current->next==NULL) printf("%d",current->item);
+        else printf("%d ",current->item);
+        current=current->next;
+    }
+
+    return 0;
+}
