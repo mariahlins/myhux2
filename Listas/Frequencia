@@ -1,0 +1,56 @@
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include <stdlib.h>
+
+typedef struct node{
+    int item;
+    char itemC;
+    struct node *next;
+}node;
+
+void freeList(node *head){
+    while(head!=NULL){
+        node *temp=head;
+        head=head->next;
+        free(temp);
+    }
+}
+
+node* add(node *head, int item,char letra){
+    node *new_node = (node*) malloc(sizeof(struct node));
+    new_node->item = item;
+    new_node->next = head;
+    new_node->itemC = letra;
+    return new_node;
+}
+
+int main(){
+    node* lista=NULL;
+    int tabela[256];
+    char frase[100];
+    memset(tabela,0,sizeof(tabela));
+    fgets(frase,sizeof(frase),stdin);
+    int cont=strlen(frase);
+    for(int i=0;i<cont;i++){
+        int valorascii=(int)frase[i];
+        tabela[valorascii]=tabela[valorascii]+1;
+    }
+    for(int j=0;j<256;j++){
+        if(tabela[j]!=0){
+            lista=add(lista,tabela[j],(char)j);
+        }
+    }
+
+    node *current=lista;
+
+    while(current!=NULL){
+      printf("%c %d\n",current->itemC,current->item);
+      current=current->next;
+    }
+
+    freeList(current);
+    freeList(lista);
+
+  return 0;
+}
