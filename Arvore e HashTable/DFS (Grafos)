@@ -1,0 +1,164 @@
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include <stdlib.h>
+
+typedef struct node{
+    int item;
+    struct node* next;
+}node;
+
+typedef struct nameNode{
+    int index;
+    char name[16];
+    struct nameNode* next;
+}nameNode;
+
+typedef struct graph{
+    int size;
+    int* visited;
+    node** lista;
+}graph;
+
+int nameIndex(nameNode *head,char name[]){
+    nameNode *aux=head;
+    while(aux!=NULL && strcmp(aux->name, name)!= 0){
+        aux = aux->next;
+    } 
+    if(aux!=NULL) return aux->index;
+    return -1;
+}
+
+graph *createGraph(){
+    graph *grafo=(graph*)malloc(sizeof(graph));
+    grafo->size=100;
+    grafo->lista=(node**)malloc(grafo->size * sizeof(node*));
+    grafo->visited=(int*)malloc(grafo->size * sizeof(int));
+    for(int i=0;i<grafo->size;i++){
+        grafo->visited[i]=1;
+        grafo->lista[i]=NULL;
+    }
+    return grafo;
+}
+
+node *addList(node *head,int item){
+    node *newNode=(node*)malloc(sizeof(node));
+    newNode->item=item;
+    newNode->next=head;
+    return newNode;
+}
+
+node *removeNode(node *head,int item){
+    node *current=head;
+    node *prev=NULL;
+
+    if(head==NULL) return head;
+
+    while(current!=NULL && current->item!=item){
+        prev=current;
+        current=current->next;
+    }
+    if(current==NULL) return head;
+    if(prev==NULL)  head=head->next;
+    else prev->next=current->next;
+    free(current);
+    return head;
+}
+
+nameNode *addnameNode(nameNode *head,char name[],int item){
+    nameNode *newNode=(nameNode*)malloc(sizeof(nameNode));
+    newNode->index=item;
+    strcpy(newNode->name, name);
+    newNode->next=NULL;
+
+    if(head==NULL || strcmp(name,head->name)<=0){
+        newNode->next=head;
+        return newNode;
+    }
+    nameNode *current=head;
+    nameNode *prev=NULL;
+    while(current!=NULL && strcmp(current->name,name)<=0){
+        prev=current;
+        current=current->next;
+    }
+    prev->next=newNode;
+    newNode->next=current;
+
+    return head;
+}
+
+nameNode *removenameNode(nameNode *head,int item){
+    nameNode *current=head;
+    nameNode *prev=NULL;
+
+    if(head==NULL) return head;
+
+    while(current!=NULL && current->index!=item){
+        prev=current;
+        current=current->next;
+    }
+    if(current==NULL) return head;
+
+    if(prev==NULL) head=head->next;
+    else prev->next=current->next;
+
+    free(current);
+    return head;
+}
+
+void dfs(graph *grafo,nameNode *head, int size){
+    while(head!=NULL){
+        nameNode *aux=head;
+        nameNode *aux2=NULL;
+        while(aux!=NULL){
+            int index=nameIndex(head, aux->name);
+            if(grafo->lista[index]==NULL) aux2=addnameNode(aux2,aux->name,index);
+            aux=aux->next;
+        }
+
+        nameNode *current=aux2;
+        while(current!=NULL){
+            printf("%s\n",current->name);
+            current=current->next;
+        }
+
+        aux=aux2;
+        while(aux!= NULL){
+            int index=nameIndex(head, aux->name);
+            for (int i = 0; i < size; i++) {
+                grafo->lista[i]=removeNode(grafo->lista[i], index);
+            }
+            head=removenameNode(head,aux->index);
+            aux=aux->next;
+        }
+    }
+}
+
+int main(){
+    int nEntradas;
+    while(scanf("%d", &nEntradas)!=EOF){
+        int size=0;
+        graph *grafo=createGraph();
+        node *head=NULL;
+        nameNode *headname=NULL;
+        char entrada1[16], entrada2[16];
+        for (int i=0;i<nEntradas;i++){
+            scanf("%s %s",entrada1,entrada2);
+            int index1=nameIndex(headname, entrada1);
+            if(index1==-1){
+                headname=addnameNode(headname,entrada1,size);
+                index1=size;
+                size++;
+            }
+            int index2=nameIndex(headname, entrada2);
+            if(index2==-1){
+                headname=addnameNode(headname,entrada2,size);
+                index2=size;
+                size++;
+            }
+            grafo->lista[index1]=addList(grafo->lista[index1],index2);
+        }
+        dfs(grafo,headname,size);
+    }
+  return 0;
+}
