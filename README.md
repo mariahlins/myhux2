@@ -17,5 +17,4 @@ O conteúdo deste repositório inclui:
 ## <h2>Como navegar</h2>
 
 - Cada diretório contém implementações e exemplos relacionados a uma estrutura de dados específica.
-- Os códigos estão devidamente comentados para facilitar a compreensão.
 - Sinta-se à vontade para explorar, estudar e contribuir com melhorias ou correções.
