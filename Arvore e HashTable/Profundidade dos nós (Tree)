@@ -1,0 +1,71 @@
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include <stdlib.h>
+
+typedef struct binaryTree{
+  int item;
+  struct binaryTree *left;
+  struct binaryTree *right;
+} binaryTree;
+
+binaryTree* createEmptyBinaryTree(){
+  return NULL;
+}
+
+binaryTree *createBinaryTree(int item, binaryTree *left,binaryTree *right){
+  binaryTree *newTree=(binaryTree*)malloc(sizeof(binaryTree));
+  newTree->item=item;
+  newTree->left=left;
+  newTree->right=right;
+  return newTree;
+}
+
+int searchDpt(binaryTree *tree, int dgtProc, int profund){
+  if(tree==NULL) return -1;
+  if(tree->item==dgtProc) return profund;
+
+  int leftDepth=searchDpt(tree->left,dgtProc,profund+1);
+  if(leftDepth!=-1) return leftDepth;
+
+  int rightDepth=searchDpt(tree->right,dgtProc,profund+1);
+  if(rightDepth!=-1) return rightDepth;
+  return -1;
+}
+
+binaryTree *createTree(){
+  char caract;
+  int item;
+  scanf("%d",&item);
+
+  binaryTree *newNode=createBinaryTree(item, NULL, NULL);
+  scanf(" %c",&caract);
+
+  if(caract==')') return NULL;
+
+  if(caract=='('){
+    newNode->left=createTree();
+  }
+  scanf( "%c",&caract);
+  if(caract=='('){
+    newNode->right=createTree();
+  }
+  scanf(" %c",&caract);
+  return newNode;
+}
+
+int main(){
+  char caract;
+  int digito;
+  scanf("%c",&caract);
+  binaryTree *root=createTree();
+
+  scanf("%d",&digito);
+
+  int profundidade=searchDpt(root,digito,0);
+
+  if(profundidade!=-1) printf("ESTA NA ARVORE\n%d",profundidade);
+  else printf("NAO ESTA NA ARVORE\n-1");
+
+  return 0;
+}
