@@ -1,0 +1,152 @@
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include <stdlib.h>
+
+typedef struct node{
+  int item;
+  struct node *next;
+}node;
+
+typedef struct queue{
+  int *data;
+  int head;
+  int end;
+  int size;
+  int max;
+}queue;
+
+typedef struct graph{
+  int *distance;
+  int *prev;
+  int quant;
+  node **Node;
+}graph;
+
+graph *createGraph(int size){
+    graph *grafo=(graph*)malloc(sizeof(graph));
+    grafo->quant=size;
+    grafo->Node=(node**)malloc(grafo->quant * sizeof(node*));
+    grafo->distance=(int*)malloc(grafo->quant * sizeof(int));
+    grafo->prev=(int*)malloc(grafo->quant * sizeof(int));
+    for(int i=0;i<grafo->quant;i++){
+        grafo->prev[i]= -1;
+        grafo->distance[i]= -1;
+        grafo->Node[i]=NULL;
+    }
+    return grafo;
+}
+
+queue *createQueue(int size){
+  queue *newQueue=(queue*)malloc(sizeof(queue));
+  newQueue->data=(int*)malloc(size * sizeof(int));
+  newQueue->max=size;
+  return newQueue;
+}
+
+void enqueue(queue* queue, int item){
+    queue->data[queue->end]=item;
+    queue->end=(queue->end + 1)%queue->max;
+    queue->size++;
+}
+
+int dequeue(queue* queue){
+    int aux=queue->data[queue->head];
+    queue->head=(queue->head + 1) %queue->max;
+    queue->size--;
+    return aux;
+}
+
+
+void search(graph *grafo,int start,int end){
+  int size=grafo->quant;
+  memset(grafo->distance, -1, size);
+  memset(grafo->prev, -1, size);
+  grafo->distance[start]=0;
+
+  queue *newQueue=createQueue(size);
+  enqueue(newQueue,start);
+  while(newQueue->size>0){
+    int current=dequeue(newQueue);
+    printf("Iniciando busca em largura a partir de %d\n", current);
+    node *aux=grafo->Node[current];
+    while(aux!=NULL){
+      int i=aux->item;
+      if(grafo->distance[i]==-1){
+        grafo->distance[i]=grafo->distance[current] + 1;
+        grafo->prev[i]=current;
+        enqueue(newQueue,i);
+      }
+      aux=aux->next;
+    }
+  }
+  free(newQueue->data);
+  free(newQueue);
+}
+
+node *createNode(int item){
+  node *newNode=(node*)malloc(sizeof(node));
+  newNode->item=item;
+  newNode->next=NULL;
+  return newNode;
+}
+
+void addEdge(graph *grafo,int head,int end){
+    node **newNode=&(grafo->Node[head]);
+    while(*newNode && end>(*newNode)->item) newNode=&((*newNode)->next);
+    node *aux=createNode(end);
+    aux->item=end;
+    aux->next=*newNode;
+    *newNode=aux;
+}
+
+void caminho(int prev[],int start,int end){
+  if(start==end) printf("%d",start);
+  else{
+    caminho(prev,start,prev[end]);
+    printf(" => %d",end);
+  }
+}
+
+int main(){
+  int vertices,edges,nEntradas,orig,dest;
+  scanf("%d %d %d",&vertices,&edges,&nEntradas);
+  graph* grafo=createGraph(vertices);
+  for(int i=0;i<edges;i++){
+    scanf("%d %d",&orig,&dest);
+    addEdge(grafo,orig,dest);
+  }
+
+  for(int i=1;i<=nEntradas;i++){
+    int start,end;
+    scanf("%d %d",&start,&end);
+    printf("\n--------\n\nCaso de Teste #%d - BFS(%d)\n\n", i, start);
+    search(grafo,start,end);
+    printf("\n");
+    for(int j=0;j<vertices;j++){
+      if(grafo->distance[j]== -1) printf("%d | - | -\n",j);
+      else if (grafo->distance[j] == 0) printf("%d | %d | -\n", j, grafo->distance[j]);
+      else printf("%d | %d | %d\n", j, grafo->distance[j], grafo->prev[j]);
+    }
+    if(grafo->distance[end]== -1) printf("\nSem caminho entre %d e %d\n",start,end);
+    else{
+      printf("\nCaminho entre %d e %d: ",start,end);
+      caminho(grafo->prev,start,end);
+    }
+  }
+  for(int i=0;i<vertices;i++){
+    node* current=grafo->Node[i];
+    while(current!=NULL){
+      node* temp=current;
+      current=current->next;
+      free(temp);
+    }
+  }
+
+  printf("\n--------\n");
+  free(grafo->Node);
+  free(grafo->distance);
+  free(grafo->prev);
+  free(grafo);
+  return 0;
+}
