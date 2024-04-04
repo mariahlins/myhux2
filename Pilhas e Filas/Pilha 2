@@ -1,0 +1,63 @@
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include <stdlib.h>
+
+struct stack{
+    struct node *top;
+};
+
+struct node{
+    int item;
+    struct node *next;
+};
+
+struct stack* create_stack(){
+    struct stack *new_stack=(struct stack*)malloc(sizeof(struct stack));
+    new_stack->top = NULL;
+    return new_stack;
+}
+
+void empilhar(struct stack *stack, int item){
+    struct node *new_top=(struct node*) malloc(sizeof(struct node));
+    new_top->item=item;
+    new_top->next=stack->top;
+    stack->top=new_top;
+}
+
+void imprimir(struct stack *stack){
+    struct node *top=stack->top;
+    while(top!=NULL){
+        if(top->next==NULL){
+            printf("%d\n",top->item);
+            return;
+        }
+        printf("%d ",top->item);
+        top=top->next;
+    }
+}
+
+void desempilhar(struct stack *stack){
+    struct node *temp=stack->top;
+    int item=temp->item;
+    stack->top=temp->next;
+    free(temp);
+}
+
+int main(){
+    struct stack *stack=create_stack();
+    char comando[12];
+    int item;
+
+    while(scanf("%s",comando)==1 && strcmp(comando, "Fim")!=0){
+        if(strcmp(comando,"Empilhar")==0){
+            scanf("%d", &item);
+            empilhar(stack, item);
+            imprimir(stack);
+        }else if(strcmp(comando, "Desempilhar")==0){
+            desempilhar(stack);
+            imprimir(stack);
+        }
+    }
+  return 0;
+}
