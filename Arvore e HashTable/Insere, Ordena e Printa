@@ -1,0 +1,52 @@
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include <stdlib.h>
+
+typedef struct binaryTree{
+  int item;
+  struct binaryTree *left;
+  struct binaryTree *right;
+} binaryTree;
+
+binaryTree *createBinaryTree(int item, binaryTree *left,binaryTree *right){
+  binaryTree *newTree=(binaryTree*)malloc(sizeof(binaryTree));
+  newTree->item=item;
+  newTree->left=left;
+  newTree->right=right;
+  return newTree;
+}
+
+binaryTree *pushTree(binaryTree *root,int item){
+  binaryTree *newTree=createBinaryTree(item,NULL,NULL);
+  if(root==NULL)  return root=newTree;
+  if(item<root->item) root->left=pushTree(root->left,item);
+  else if(item>=root->item)  root->right=pushTree(root->right,item);
+
+  return root;
+}
+
+void preOrder(binaryTree* root){
+
+    if(root==NULL) printf("  ()");
+    else{
+        printf("  ( %d", root->item);
+        preOrder(root->left);
+        preOrder(root->right);
+        printf(" )");
+    }
+}
+
+int main(){
+  int item;
+  binaryTree *root=NULL;
+  while(scanf("%d",&item)!=EOF){
+    printf("----\nAdicionando %d\n ",item);
+    root=pushTree(root,item);
+    preOrder(root);
+    printf(" \n");
+  }
+  printf("----");
+
+  return 0;
+}
