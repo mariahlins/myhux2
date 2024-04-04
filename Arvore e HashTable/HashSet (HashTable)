@@ -1,0 +1,140 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+typedef struct element{
+    int item;
+    struct element *next;
+}element;
+
+typedef struct hash{
+    int total;
+    int size;
+    element **table;
+    int *listSize;
+}hash;
+
+hash *createHash(int hashSize){
+    hash *new_hash=(hash*)malloc(sizeof(hash));
+    new_hash->size=hashSize;
+    new_hash->total=0;
+    new_hash->table=(element**)malloc(hashSize * sizeof(element*));
+    new_hash->listSize=(int*)malloc(hashSize * sizeof(int));
+    for(int i=0;i<hashSize;i++){
+        new_hash->table[i]=NULL;
+        new_hash->listSize[i]=0;
+    }
+    return new_hash;
+}
+
+void freeHash(hash *hashT){
+    for(int i=0;i<hashT->size;i++){
+        element *current=hashT->table[i];
+        while(current!=NULL){
+            element *next=current->next;
+            free(current);
+            current=next;
+        }
+    }
+    free(hashT->table);
+    free(hashT->listSize);
+    free(hashT);
+}
+
+int delete(hash *hashT, int item, int *cont){
+    int index=item%hashT->size;
+    element *prev=NULL;
+    element *current=hashT->table[index];
+    while(current!=NULL){
+        (*cont)++;
+        if(current->item==item){
+            if(prev==NULL) hashT->table[index]=current->next;
+            else prev->next=current->next;
+            free(current);
+            hashT->listSize[index]--;
+            hashT->total--;
+            return 1;
+        }
+        prev=current;
+        current=current->next;
+    }
+    return 0;
+}
+
+int add(hash *hashT, int item, int *cont){
+    int index=item%hashT->size;
+    if(confere(hashT,item,cont)==1)return 0;
+
+    element *newElement=(element *)malloc(sizeof(element));
+    if(newElement==NULL)  return 0;
+
+    newElement->item=item;
+    newElement->next=hashT->table[index];
+    hashT->table[index]=newElement;
+    hashT->total++;
+    hashT->listSize[index]++;
+    return 1;
+}
+
+hash *rehashing(hash *hashT, int i){
+    hash *new_hash=createHash(2*i-1);
+    for(int j=0;j<hashT->size;j++){
+        element *aux=hashT->table[j];
+        while(aux!=NULL){
+            int cont=0;
+            add(new_hash,aux->item,&cont);
+            aux=aux->next;
+        }
+    }
+    freeHash(hashT);
+    return new_hash;
+}
+
+int confere(hash *hashT, int item, int *cont){
+    int index=item%hashT->size;
+    element *aux=hashT->table[index];
+    while(aux!=NULL){
+        if(aux->item==item){
+            (*cont)++;
+            return 1;
+        }
+        (*cont)++;
+        aux=aux->next;
+    }
+    return 0;
+}
+
+int main() {
+    char comando[4];
+    int item,cont=0,operacao,i=0;
+    hash *hashTable=createHash(7);
+
+    while(scanf(" %s",comando)!=EOF){
+        printf("%d ",i);
+        cont=0;
+        if(strcmp(comando, "ADD")==0){
+            scanf("%d", &item);
+            operacao=add(hashTable, item, &cont);
+            double a=(double)hashTable->total/hashTable->size;
+            if (a>=0.75) hashTable=rehashing(hashTable, hashTable->size);
+            printf("%d %d\n",operacao,cont);
+        }else if(strcmp(comando,"DEL")==0){
+            scanf("%d", &item);
+            operacao=delete(hashTable, item, &cont);
+            printf("%d %d\n", operacao, cont);
+        }else if(strcmp(comando,"HAS")==0){
+            scanf("%d", &item);
+            operacao=confere(hashTable, item, &cont);
+            printf("%d %d\n", operacao, cont);
+        }else if(strcmp(comando,"PRT")==0){
+            int maior=0;
+            for(int j=0;j<hashTable->size;j++){
+                if(hashTable->listSize[j]>maior) maior=hashTable->listSize[j];
+            }
+            printf("%d %d %d\n", hashTable->size, hashTable->total, maior);
+        }
+        i++;
+    }
+    freeHash(hashTable);
+    return 0;
+}
