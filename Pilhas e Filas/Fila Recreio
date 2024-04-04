@@ -1,0 +1,115 @@
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include <stdlib.h>
+
+typedef struct node {
+    int data;
+    struct node* next;
+} node;
+
+typedef struct {
+    node* front;
+    node* rear;
+} queue;
+
+void clearQueue(queue* queue) {
+    while (queue->front != NULL) {
+        node* temp = queue->front;
+        queue->front = queue->front->next;
+        free(temp);
+    }
+    free(queue);
+}
+
+queue* createQueue() {
+    queue* fila = (queue*)malloc(sizeof(queue));
+    if (fila == NULL) {
+        printf("Erro: N�o foi poss�vel alocar mem�ria para a fila.\n");
+        exit(EXIT_FAILURE);
+    }
+    fila->front = NULL;
+    fila->rear = NULL;
+    return fila;
+}
+
+void enqueue(queue* queue, int data) {
+    node* newNode = (node*)malloc(sizeof(node));
+    if (newNode == NULL) {
+        printf("Erro: N�o foi poss�vel alocar mem�ria para o novo n�.\n");
+        exit(EXIT_FAILURE);
+    }
+    newNode->data = data;
+    newNode->next = NULL;
+    if (queue->rear == NULL) {
+        queue->front = newNode;
+        queue->rear = newNode;
+    } else {
+        queue->rear->next = newNode;
+        queue->rear = newNode;
+    }
+}
+
+void enqueueInOrder(queue* queue, int item) {
+    node* newNode = (node*)malloc(sizeof(node));
+    newNode->data = item;
+    newNode->next = NULL;
+
+    if (queue->front==NULL || item>= queue->front->data) {
+        newNode->next = queue->front;
+        queue->front = newNode;
+    } else {
+        node* current = queue->front;
+        while (current->next != NULL && current->next->data > item) {
+            current = current->next;
+        }
+        newNode->next = current->next;
+        current->next = newNode;
+    }
+
+    if (queue->rear == NULL) {
+        queue->rear = newNode;
+    }
+}
+
+void confereFila() {
+    queue* fila = createQueue();
+    queue* fila2 = createQueue();
+    int alunos;
+    scanf("%d", &alunos);
+
+    for (int i = 0; i < alunos; i++) {
+        int nota;
+        scanf("%d", &nota);
+        enqueue(fila, nota);
+        enqueueInOrder(fila2,nota);
+    }
+
+    int nTroca = 0;
+
+    node* current = fila->front;
+    node* current2 = fila2->front;
+
+    while (current != NULL) {
+      if(current->data==current2->data) nTroca++;
+      current=current->next;
+      current2=current2->next;
+    }
+
+    printf("%d\n", nTroca);
+
+    clearQueue(fila);
+    clearQueue(fila2);
+}
+
+int main() {
+    int casos;
+
+    scanf("%d", &casos);
+
+    for (int i = 0; i < casos; i++) {
+        confereFila();
+    }
+
+    return 0;
+}
