@@ -1,0 +1,98 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+typedef struct binaryTree {
+    int item;
+    struct binaryTree *prev;
+    struct binaryTree *left;
+    struct binaryTree *right;
+} binaryTree;
+
+binaryTree *createBinaryTree(int item, binaryTree *left, binaryTree *right,binaryTree *prev){
+    binaryTree *newTree=(binaryTree *)malloc(sizeof(binaryTree));
+    newTree->item=item;
+    newTree->left=left;
+    newTree->right=right;
+    newTree->prev=prev;
+    return newTree;
+}
+
+void search(binaryTree *root,binaryTree *newTree){
+    if(root==NULL || newTree==NULL) return;
+    if(root==newTree) return;
+    if(root->item==newTree->item && root->prev!=NULL){
+      if(root->prev->left==root) root->prev->left=newTree;
+      else root->prev->right=newTree;
+
+      newTree->prev=root->prev;
+      return;
+    }
+    search(root->left,newTree);
+    search(root->right,newTree);
+}
+
+binaryTree *addTree(binaryTree *rootC,binaryTree *root){
+    if(rootC==NULL) return root;
+    if(root==NULL) return rootC;
+    if(rootC->item==root->item) return root;
+
+    search(rootC,root);
+    if(root->prev==NULL){
+        binaryTree *aux=rootC;
+        while(aux->right!=NULL){
+            aux=aux->right;
+        }
+        aux->right=root;
+        root->prev=aux;
+    }
+    return rootC;
+}
+
+binaryTree *createTree(char arvore[], int *index,binaryTree *prev){
+    char caract;
+    caract=arvore[(*index)++];
+    int item=0,MEUDEUSPSINAL=1;
+    if(caract=='-'){
+        caract=arvore[(*index)++];
+        MEUDEUSPSINAL=-1;
+    }
+    while(caract!='(' && caract!=')'){
+        if(caract>='0' && caract<='9'){ 
+          int valor=caract-'0';
+          item=(item*10)+valor;
+        }
+        caract=arvore[(*index)++];
+    }
+    item*=MEUDEUSPSINAL;
+    binaryTree *newNode=createBinaryTree(item, NULL, NULL, prev);
+    if(caract==')') return NULL;
+    if(caract=='(') newNode->left=createTree(arvore, index,newNode);
+    caract=arvore[(*index)++];
+    if (caract == '(')  newNode->right=createTree(arvore, index,newNode);
+    caract=arvore[(*index)++];
+    return newNode;
+}
+
+void printTree(binaryTree* root){
+    if(root==NULL) printf("()");
+    else{
+        printf("(%d", root->item);
+        printTree(root->left);
+       printTree(root->right);
+        printf(")");
+    }
+}
+
+int main() {
+    char arvore[300];
+    binaryTree *rootComplete=NULL;
+    while (fgets(arvore, sizeof(arvore), stdin)!=NULL){
+        if(strcmp(arvore,"()\n")==0) break;
+        int index=1;
+        binaryTree *root=createTree(arvore,&index,NULL);
+        rootComplete=addTree(rootComplete,root);
+    }
+        printTree(rootComplete);
+    return 0;
+}
