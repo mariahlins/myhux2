@@ -1,0 +1,71 @@
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include <stdlib.h>
+
+typedef struct element{
+    int key;
+    int item;
+    struct element *next;
+}element;
+
+typedef struct hash{
+    int size;
+    element **table;
+}hash;
+
+hash *createHash(int hashSize){
+    hash *new_hash=(hash*)malloc(sizeof(hash));
+    new_hash->size=hashSize;
+    new_hash->table=(element**)malloc(hashSize * sizeof(element));
+    for(int i=0;i<hashSize;i++){
+        new_hash->table[i]=NULL;
+    }
+    return new_hash;
+}
+
+void completeHash(hash *hashTable,int nEntradas){
+    int key;
+    for(int i=0;i<nEntradas;i++){
+        scanf("%d",&key);
+
+        int index=key%hashTable->size;
+
+        element *new_element=(element*)malloc(sizeof(element));
+
+        new_element->key=key;
+        new_element->next=NULL;
+
+        if(hashTable->table[index]==NULL){
+            hashTable->table[index]=new_element;
+        }else{
+            element *current=hashTable->table[index];
+            while(current->next!=NULL){
+                current=current->next;
+            }
+            current->next=new_element;
+        }
+    }
+
+    for(int i=0;i<hashTable->size;i++){
+        printf("%d -> ",i);
+        element *current=hashTable->table[i];
+        while(current!=NULL){
+            printf("%d -> ",current->key);
+            current=current->next;
+        }
+        printf("\\\n");
+    }
+    printf("\n");
+}
+
+int main(){
+    int entradas,nEntradas,hashSize;
+    scanf("%d",&entradas);
+    for(int i=0;i<entradas;i++){
+        scanf("%d %d",&hashSize,&nEntradas);
+        hash *hashTable=createHash(hashSize);
+        completeHash(hashTable,nEntradas);
+    }
+  return 0;
+}
