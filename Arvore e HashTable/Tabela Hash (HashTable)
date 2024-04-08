@@ -1,0 +1,249 @@
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include <stdlib.h>
+
+typedef struct element{
+    int key;
+    int item;
+    struct element *next;
+}element;
+
+typedef struct hash{
+    int size;
+    element **table;
+}hash;
+
+hash *createHash(int hashSize){
+    hash *new_hash=(hash*)malloc(sizeof(hash));
+    new_hash->size=hashSize;
+    new_hash->table=(element**)malloc(hashSize * sizeof(element));
+    for(int i=0;i<hashSize;i++){
+        new_hash->table[i]=NULL;
+    }
+    return new_hash;
+}
+
+void pushHash(hash *hashTable){
+    int key;
+    scanf("%d",&key);
+
+    int index=key%hashTable->size;
+
+    element *newElement=(element*)malloc(sizeof(element));
+
+    newElement->key=key;
+    newElement->next=NULL;
+
+    if(hashTable->table[index]==NULL || key<hashTable->table[index]->key){
+        newElement->next=hashTable->table[index];
+        hashTable->table[index]=newElement;
+    }else{
+        element *current=hashTable->table[index];
+        while(current->next!=NULL &&key>=current->next->key){
+            current=current->next;
+        }
+        newElement->next=current->next;
+        current->next=newElement;
+    }
+}
+
+int pullHash(hash *hashTable,int digito){
+    int index=digito%hashTable->size;
+    element *current=hashTable->table[index];
+    element *prev=NULL;
+    while(current!=NULL && current->key!=digito){
+        prev=current;
+        current=current->next;
+    }
+    if(current!=NULL){
+        if(prev==NULL) hashTable->table[index]=current->next;
+        else prev->next=current->next;
+        free(current);
+        return 1;
+    }else{
+        return 0;
+    }
+}
+
+void printHash(hash *ht,int index){
+    if(index>=ht->size) return;
+
+    element *current=ht->table[index];
+    if(current==NULL){
+        printf("[%d]:Lista vazia!",index);
+    }else{
+        printf("[%d]:",index);
+        while(current!=NULL){
+            printf("%d=>",current->key);
+            current=current->next;
+        }
+    }
+    printf("\n");
+    printHash(ht,index+1);
+}
+
+void srcHash(hash *hashTable,int digito){
+    int index=digito%hashTable->size,cont=0;
+    element *current=hashTable->table[index];
+    while(current!=NULL){
+        cont++;
+        if(digito==current->key) break;
+        current=current->next;
+    }
+    if(current==NULL){
+      printf("elemento nao encontrado!\n");
+    }else printf("elemento %d encontrado!\n",digito);
+    printf("numero de elementos acessados na tabela hash: %d\n",cont);
+}
+
+int main(){
+    int hashSize,digito,cont=0;
+    char comando;
+    scanf("%d",&hashSize);
+    hash *hashTable=createHash(hashSize);
+
+    while(scanf(" %c",&comando)==1){
+        if(comando=='f') break;
+        else if(comando=='p'){
+            scanf("%d",&digito);
+            printf("BUSCA POR %d\nnumero de elementos da tabela hash: %d\n",digito,cont);
+            srcHash(hashTable,digito);  
+        }else if(comando=='i'){
+            printf("imprimindo tabela hash:\n");
+            printHash(hashTable,0);
+        }else if(comando=='a'){
+            cont++;
+            pushHash(hashTable);
+        }else if(comando=='r'){
+            scanf("%d",&digito);
+            if(pullHash(hashTable,digito))  cont--;
+        }
+    }
+
+  return 0;
+}#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include <stdlib.h>
+
+typedef struct element{
+    int key;
+    int item;
+    struct element *next;
+}element;
+
+typedef struct hash{
+    int size;
+    element **table;
+}hash;
+
+hash *createHash(int hashSize){
+    hash *new_hash=(hash*)malloc(sizeof(hash));
+    new_hash->size=hashSize;
+    new_hash->table=(element**)malloc(hashSize * sizeof(element));
+    for(int i=0;i<hashSize;i++){
+        new_hash->table[i]=NULL;
+    }
+    return new_hash;
+}
+
+void pushHash(hash *hashTable){
+    int key;
+    scanf("%d",&key);
+
+    int index=key%hashTable->size;
+
+    element *newElement=(element*)malloc(sizeof(element));
+
+    newElement->key=key;
+    newElement->next=NULL;
+
+    if(hashTable->table[index]==NULL || key<hashTable->table[index]->key){
+        newElement->next=hashTable->table[index];
+        hashTable->table[index]=newElement;
+    }else{
+        element *current=hashTable->table[index];
+        while(current->next!=NULL &&key>=current->next->key){
+            current=current->next;
+        }
+        newElement->next=current->next;
+        current->next=newElement;
+    }
+}
+
+int pullHash(hash *hashTable,int digito){
+    int index=digito%hashTable->size;
+    element *current=hashTable->table[index];
+    element *prev=NULL;
+    while(current!=NULL && current->key!=digito){
+        prev=current;
+        current=current->next;
+    }
+    if(current!=NULL){
+        if(prev==NULL) hashTable->table[index]=current->next;
+        else prev->next=current->next;
+        free(current);
+        return 1;
+    }else{
+        return 0;
+    }
+}
+
+void printHash(hash *ht,int index){
+    if(index>=ht->size) return;
+    
+    element *current=ht->table[index];
+    if(current==NULL){
+        printf("[%d]:Lista vazia!",index);
+    }else{
+        printf("[%d]:",index);
+        while(current!=NULL){
+            printf("%d=>",current->key);
+            current=current->next;
+        }
+    }
+    printf("\n");
+    printHash(ht,index+1);
+}
+
+void srcHash(hash *hashTable,int digito){
+    int index=digito%hashTable->size,cont=0;
+    element *current=hashTable->table[index];
+    while(current!=NULL){
+        cont++;
+        if(digito==current->key) break;
+        current=current->next;
+    }
+    if(current==NULL){
+      printf("elemento nao encontrado!\n");
+    }else printf("elemento %d encontrado!\n",digito);
+    printf("numero de elementos acessados na tabela hash: %d\n",cont);
+}
+
+int main(){
+    int hashSize,digito,cont=0;
+    char comando;
+    scanf("%d",&hashSize);
+    hash *hashTable=createHash(hashSize);
+    
+    while(scanf(" %c",&comando)==1){
+        if(comando=='f') break;
+        else if(comando=='p'){
+            scanf("%d",&digito);
+            printf("BUSCA POR %d\nnumero de elementos da tabela hash: %d\n",digito,cont);
+            srcHash(hashTable,digito);  
+        }else if(comando=='i'){
+            printf("imprimindo tabela hash:\n");
+            printHash(hashTable,0);
+        }else if(comando=='a'){
+            cont++;
+            pushHash(hashTable);
+        }else if(comando=='r'){
+            scanf("%d",&digito);
+            if(pullHash(hashTable,digito))  cont--;
+        }
+    }
+
+  return 0;
+}
