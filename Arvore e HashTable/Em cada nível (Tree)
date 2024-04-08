@@ -1,0 +1,78 @@
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include <stdlib.h>
+
+typedef struct node{
+  int itemnode;
+  int rightSon;
+  int leftSon;
+}node;
+
+typedef struct binaryTree{
+  int item;
+  struct binaryTree *left;
+  struct binaryTree *right;
+}binaryTree;
+
+binaryTree *createBinaryTree(int item, binaryTree *left,binaryTree *right){
+  binaryTree *newTree=(binaryTree*)malloc(sizeof(binaryTree));
+  newTree->item=item;
+  newTree->left=left;
+  newTree->right=right;
+  return newTree;
+}
+
+binaryTree *createTree(node arvore[],int index){
+    if(index==-1) return NULL;
+
+    binaryTree* newNode=createBinaryTree(arvore[index].itemnode,NULL,NULL);
+    newNode->left=createTree(arvore,arvore[index].leftSon);
+    newNode->right=createTree(arvore,arvore[index].rightSon);
+    return newNode;
+}
+
+int getHeight(binaryTree *root){
+  if(root==NULL) return 0;
+
+  int leftHeight=getHeight(root->left);
+  int rightHeight=getHeight(root->right);
+
+  if(leftHeight>rightHeight) return leftHeight+1;
+  else return rightHeight+1;
+}
+
+void compara(binaryTree *root,int level,int max[],int min[]){
+  if(root!=NULL){
+    if(root->item > max[level]) max[level]=root->item;
+    if(root->item < min[level]) min[level]=root->item;
+
+    compara(root->left,level+1,max,min);
+    compara(root->right,level+1,max,min);
+  }
+}
+
+void printa(int height,int max[],int min[],int level){
+  if(height<=level) return;
+  printf("Nivel %d: Maior = %d, Menor = %d\n",level+1,max[level],min[level]);
+  printa(height,max,min,level+1);
+}
+
+int main(){
+  int item,nEntradas,f1,f2;
+  binaryTree *root=NULL;
+  scanf("%d",&nEntradas);
+  node arvore[nEntradas];
+  for(int i=0;i<nEntradas;i++){
+    scanf("%d %d %d",&arvore[i].itemnode,&arvore[i].leftSon,&arvore[i].rightSon);
+  }
+  root=createTree(arvore,0);
+  int height=getHeight(root);
+  int min[height],max[height];
+  memset(min,-2147483647,sizeof(min));
+  memset(max,2147483647,sizeof(max));
+  compara(root,0,max,min);
+  printa(height,max,min,0);
+
+  return 0;
+}
